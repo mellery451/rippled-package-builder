@@ -2,7 +2,23 @@ FROM fedora:27
 RUN mkdir /opt/rippled-rpm
 WORKDIR /opt/rippled-rpm
 
-RUN yum install -y openssl-static protobuf-static gcc-c++ libstdc++-static git zlib-static cmake rpm-build gnupg wget which
+RUN yum install -y protobuf-static gcc-c++ libstdc++-static git zlib-static cmake rpm-build gnupg wget which coreutils krb5-devel perl-interpreter sed zlib-devel lksctp-tools-devel
+
+RUN wget https://www.openssl.org/source/openssl-1.1.0h.tar.gz && \
+    tar -xzf openssl-1.1.0h.tar.gz && \
+    cd openssl-1.1.0h && \
+    ./Configure \
+        --prefix=/usr/local --openssldir=/usr/local/etc/pki/tls \
+        enable-ec_nistp_64_gcc_128 \
+        zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
+        enable-cms enable-md2 enable-rc5 enable-ssl3 enable-ssl3-method \
+        enable-weak-ssl-ciphers \
+        no-mdc2 no-ec2m \
+        shared linux-x86_64 -g3 -ggdb2 && \
+    make -j2 && make install && \
+    cd .. && \
+    rm openssl-1.1.0h.tar.gz && \
+    rm -r openssl-1.1.0h
 
 RUN wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz && \
     tar -xzf boost_1_67_0.tar.gz && \
