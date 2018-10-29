@@ -39,23 +39,21 @@ mkdir -p build/gcc.release
 cd build/gcc.release
 cmake ../.. -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_BUILD_TYPE=Release -Dstatic=true -DCMAKE_VERBOSE_MAKEFILE=ON
 cmake --build . -- -j 2 verbose=1
+# now do the install of rippled so that validator-keys-tool can use it (for core lib)
+rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{_prefix}/
+make DESTDIR=$RPM_BUILD_ROOT install
 
 cd ../../../validator-keys-tool
 mkdir -p build/gcc.release
 cd build/gcc.release
-cmake ../.. -DCMAKE_BUILD_TYPE=Release -Dtarget=gcc.release -Dstatic=true -DCMAKE_VERBOSE_MAKEFILE=ON
+cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$RPM_BUILD_ROOT%{_prefix}/ -Dstatic=true -DCMAKE_VERBOSE_MAKEFILE=ON
 cmake --build . -- -j 2 verbose=1
 
 %pre
 test -e /etc/pki/tls || { mkdir -p /etc/pki; ln -s /usr/lib/ssl /etc/pki/tls; }
 
 %install
-rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_prefix}/
-echo "Installing to /opt/ripple/"
-cd rippled/build/gcc.release
-make DESTDIR=$RPM_BUILD_ROOT install
-cd ../../..
 install -d ${RPM_BUILD_ROOT}/etc/opt/ripple
 ln -s %{_prefix}/etc/rippled.cfg ${RPM_BUILD_ROOT}/etc/opt/ripple/rippled.cfg
 ln -s %{_prefix}/etc/validators.txt ${RPM_BUILD_ROOT}/etc/opt/ripple/validators.txt
