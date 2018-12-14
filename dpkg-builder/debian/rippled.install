@@ -1,0 +1,4 @@
+opt/ripple/bin/rippled
+opt/ripple/bin/validator-keys
+opt/ripple/etc/rippled.cfg
+opt/ripple/etc/validators.txt

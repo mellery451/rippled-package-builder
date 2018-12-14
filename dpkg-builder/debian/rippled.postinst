@@ -1,0 +1,33 @@
+#!/bin/sh
+set -e
+
+RIPPLEUSER=rippled
+case "$1" in
+    configure)
+        adduser --system \
+            --quiet \
+            --home /nonexistent \
+            --no-create-home \
+            --disabled-password \
+            --group "$RIPPLEUSER" || true
+
+        chown -R $RIPPLEUSER:$RIPPLEUSER /var/log/rippled/
+        chown -R $RIPPLEUSER:$RIPPLEUSER /var/lib/rippled/
+        chown -R $RIPPLEUSER:$RIPPLEUSER /opt/ripple
+        chmod 755 /var/log/rippled/
+        chmod 755 /var/lib/rippled/
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+
+#DEBHELPER#
+
+exit 0
