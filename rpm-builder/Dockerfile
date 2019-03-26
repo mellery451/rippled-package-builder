@@ -1,5 +1,7 @@
 FROM fedora:28
 RUN mkdir /opt/rippled-rpm
+ARG GITHUB_USER
+ARG GITHUB_TOKEN
 WORKDIR /opt/rippled-rpm
 
 RUN yum install -y openssl-static protobuf-static gcc-c++ libstdc++-static git zlib-static cmake rpm-build gnupg wget which make
@@ -16,7 +18,8 @@ RUN wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.
 RUN mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 RUN echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
 
-RUN git clone https://github.com/ripple/rippled.git
+#RUN git clone https://github.com/ripple/rippled.git
+RUN git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/ripple/rippledavid.git rippled
 
 RUN git clone https://github.com/ripple/validator-keys-tool.git
 
